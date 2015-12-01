@@ -20,8 +20,6 @@ class Migration extends \webtoucher\migrate\components\Migration
 	/** @var array */
 	private $fk = [];
 	/** @var array */
-	private $permissions = [];
-	/** @var array */
 	private $fields = [];
 
 	/**
@@ -41,8 +39,8 @@ class Migration extends \webtoucher\migrate\components\Migration
 	 * [
 	 *      'table1' =>
 	 *      [
-	 *          'id' => 'pk',
-	 *          'name' => 'varchar(255)',
+	 *          'id' => $this->primaryKey(),
+	 *          'name' => $this->string(255)->notNull(),
 	 *          ...
 	 *      ]
 	 *];
@@ -108,7 +106,6 @@ class Migration extends \webtoucher\migrate\components\Migration
 			$this->tableUp();
 			$this->fieldsUp();
 			$this->fkUp();
-			$this->permissionUp();
 		} catch (\Exception $e) {
 			return false;
 		}
@@ -153,7 +150,7 @@ class Migration extends \webtoucher\migrate\components\Migration
 			$name   = $this->getFkName($fk);
 			$tables = array_keys($fk);
 			$keys   = $tables;
-			if ($tables[1] == 'self') {
+			if ($tables[1] === 'self') {
 				$tables[1] = $tables[0];
 			}
 
@@ -195,7 +192,6 @@ class Migration extends \webtoucher\migrate\components\Migration
 			$this->fkDown();
 			$this->fieldsDown();
 			$this->tableDown();
-			$this->permissionDown();
 		} catch (\Exception $e) {
 			return false;
 		}
