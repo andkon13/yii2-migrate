@@ -1,6 +1,6 @@
 миграции используют webtoucher/yii2-migrate для разделения миграций на модули
 uses:
-
+```
 class m000000_000000_users extends \andkon\migrate\Migration
 {
     public function setTables()
