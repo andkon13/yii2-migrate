@@ -1,0 +1,22 @@
+{
+  "name": "andkon/yii2-migrate",
+  "description": "Класс для упрощения написания миграций",
+  "minimum-stability": "dev",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Andrey Konenkov",
+      "email": "andkon13@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.4.0",
+    "yiisoft/yii2": ">=2.0.5",
+    "webtoucher/yii2-migrate": ">=v1.0.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "andkon\\migrate\\": ""
+    }
+  }
+}
