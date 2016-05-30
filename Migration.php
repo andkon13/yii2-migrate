@@ -13,224 +13,284 @@ namespace andkon\migrate;
  */
 class Migration extends \webtoucher\migrate\components\Migration
 {
-	/** @var string */
-	protected $tableOptions = 'ENGINE=InnoDB DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci';
-	/** @var array */
-	private $tables = [];
-	/** @var array */
-	private $fk = [];
-	/** @var array */
-	private $fields = [];
+    /** @var string */
+    protected $tableOptions = 'ENGINE=InnoDB DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci';
+    /** @var array */
+    private $tables = [];
+    /** @var array */
+    private $fk = [];
+    /** @var array */
+    private $fields = [];
 
-	/**
-	 * @return void
-	 */
-	public function init()
-	{
-		parent::init();
-		$this->tables = $this->setTables();
-		$this->fields = $this->setFields();
-		$this->fk     = $this->setForeignKeys();
-	}
+    /**
+     * @return void
+     */
+    public function init()
+    {
+        parent::init();
+        $this->tables = $this->setTables();
+        $this->fields = $this->setFields();
+        $this->fk     = $this->setForeignKeys();
+    }
 
-	/**
-	 * Назначает таблицы для их создания при UP/удалени при DOWN
-	 * <code>
-	 * [
-	 *      'table1' =>
-	 *      [
-	 *          'id' => $this->primaryKey(),
-	 *          'name' => $this->string(255)->notNull(),
-	 *          ...
-	 *      ]
-	 *];
-	 * </code>
-	 *
-	 * @return array
-	 */
-	public function setTables()
-	{
-		return [];
-	}
+    /**
+     * Назначает таблицы для их создания при UP/удалени при DOWN
+     * <code>
+     * [
+     *      'table1' =>
+     *      [
+     *          'id' => $this->primaryKey(),
+     *          'name' => $this->string(255)->notNull(),
+     *          ...
+     *      ]
+     *];
+     * </code>
+     *
+     * @return array
+     */
+    public function setTables()
+    {
+        return [];
+    }
 
-	/**
-	 * Добавляем поля к табличам
-	 * <code>
-	 * [
-	 *      table => [
-	 *          [fieldName => type],
-	 *          [fieldName => type],
-	 *      ]
-	 * ]
-	 * </code>
-	 *
-	 * @return array
-	 */
-	protected function setFields()
-	{
-		return [];
-	}
+    /**
+     * Добавляем поля к табличам
+     * <code>
+     * [
+     *      table => [
+     *          [fieldName => type],
+     *          [fieldName => type],
+     *      ]
+     * ]
+     * </code>
+     *
+     * @return array
+     */
+    protected function setFields()
+    {
+        return [];
+    }
 
-	/**
-	 * Устанавливает внешние ключи которые будут добавлены/удалены при up/down
-	 * <code>
-	 * [
-	 *      [
-	 *          'tableFrom' => 't2_id',
-	 *          'tableTo' => 'id'
-	 *      ],
-	 *      [
-	 *          'tableFrom2'=> 'parent_id',
-	 *          'self' => 'id', // self - ссылка на эту-же таблицу
-	 *          'delete' => 'CASCADE',// default
-	 *          'update' => 'NO ACTION'// default
-	 *      ],
-	 * ]
-	 * </code>
-	 *
-	 * @return array
-	 */
-	public function setForeignKeys()
-	{
-		return [];
-	}
+    /**
+     * Устанавливает внешние ключи которые будут добавлены/удалены при up/down
+     * <code>
+     * [
+     *      [
+     *          'tableFrom' => 't2_id',
+     *          'tableTo' => 'id'
+     *      ],
+     *      [
+     *          'tableFrom2'=> 'parent_id',
+     *          'self' => 'id', // self - ссылка на эту-же таблицу
+     *          'delete' => 'CASCADE',// default
+     *          'update' => 'NO ACTION'// default
+     *      ],
+     * ]
+     * </code>
+     *
+     * @return array
+     */
+    public function setForeignKeys()
+    {
+        return [];
+    }
 
-	/**
-	 * Применяет миграцию
-	 *
-	 * @return bool
-	 */
-	public function safeUp()
-	{
-		try {
-			$this->tableUp();
-			$this->fieldsUp();
-			$this->fkUp();
-		} catch (\Exception $e) {
-			return false;
-		}
+    /**
+     * Добавляет/убирает записи в бд
+     * <code>
+     *  return [
+     *      'tableName' => [
+     *          ['id' => 1, 'name' => 'example1', 'type' => 1],
+     *          ['id' => 2, 'name' => 'example2', 'type' => 2],
+     *          ...
+     *      ]
+     * ];
+     * </code>
+     *
+     * @return array
+     */
+    public function setValues()
+    {
+        return [];
+    }
 
-		return true;
-	}
+    /**
+     * Применяет миграцию
+     *
+     * @return bool
+     */
+    public function safeUp()
+    {
+        try {
+            $this->tableUp();
+            $this->fieldsUp();
+            $this->valUp();
+            $this->fkUp();
+        } catch (\Exception $e) {
+            return false;
+        }
 
-	/**
-	 * Создает таблицы
-	 *
-	 * @return void
-	 */
-	protected function tableUp()
-	{
-		foreach ($this->tables as $tableName => $fields) {
-			$this->createTable($tableName, $fields, $this->tableOptions);
-		}
-	}
+        return true;
+    }
 
-	/**
-	 * Добавляет поля
-	 *
-	 * @return void
-	 */
-	protected function fieldsUp()
-	{
-		foreach ($this->fields as $table => $fields) {
-			foreach ($fields as $fieldsName => $type) {
-				$this->addColumn($table, $fieldsName, $type);
-			}
-		}
-	}
+    /**
+     * Создает таблицы
+     *
+     * @return void
+     */
+    protected function tableUp()
+    {
+        foreach ($this->tables as $tableName => $fields) {
+            $this->createTable($tableName, $fields, $this->tableOptions);
+        }
+    }
 
-	/**
-	 * создает внешние ключи
-	 *
-	 * @return void
-	 */
-	protected function fkUp()
-	{
-		foreach ($this->fk as $fk) {
-			$name   = $this->getFkName($fk);
-			$tables = array_keys($fk);
-			$keys   = $tables;
-			if ($tables[1] === 'self') {
-				$tables[1] = $tables[0];
-			}
+    /**
+     * Добавляет поля
+     *
+     * @return void
+     */
+    protected function fieldsUp()
+    {
+        foreach ($this->fields as $table => $fields) {
+            foreach ($fields as $fieldsName => $type) {
+                $this->addColumn($table, $fieldsName, $type);
+            }
+        }
+    }
 
-			$fk = array_merge(['delete' => 'CASCADE', 'update' => 'NO ACTION'], $fk);
-			$this->addForeignKey(
-				$name,
-				$tables[0],
-				$fk[$keys[0]],
-				$tables[1],
-				$fk[$keys[1]],
-				$fk['delete'],
-				$fk['update']
-			);
-		}
-	}
+    /**
+     * создает внешние ключи
+     *
+     * @return void
+     */
+    protected function fkUp()
+    {
+        foreach ($this->fk as $fk) {
+            $name   = $this->getFkName($fk);
+            $tables = array_keys($fk);
+            $keys   = $tables;
+            if ($tables[1] === 'self') {
+                $tables[1] = $tables[0];
+            }
 
-	/**
-	 * Генегирует имя связи
-	 *
-	 * @param array $fk описание связи
-	 *
-	 * @return string
-	 */
-	protected function getFkName($fk)
-	{
-		$name = implode('_', array_merge(array_keys($fk), $fk));
+            $fk = array_merge(['delete' => 'CASCADE', 'update' => 'NO ACTION'], $fk);
+            $this->addForeignKey(
+                $name,
+                $tables[0],
+                $fk[$keys[0]],
+                $tables[1],
+                $fk[$keys[1]],
+                $fk['delete'],
+                $fk['update']
+            );
+        }
+    }
 
-		return $name;
-	}
+    /**
+     * инсертит данные
+     *
+     * @return bool
+     */
+    protected function valUp()
+    {
+        $data = $this->setValues();
+        if (count($data)) {
+            foreach ($data as $tabName => $valArray) {
+                foreach ($valArray as $item) {
+                    $this->insert($tabName, $item);
+                }
+            }
+        }
 
-	/**
-	 * Откатывает миграцию
-	 *
-	 * @return bool
-	 */
-	public function safeDown()
-	{
-		try {
-			$this->fkDown();
-			$this->fieldsDown();
-			$this->tableDown();
-		} catch (\Exception $e) {
-			return false;
-		}
+        return true;
+    }
 
-		return true;
-	}
+    /**
+     * Генегирует имя связи
+     *
+     * @param array $fk описание связи
+     *
+     * @return string
+     */
+    protected function getFkName($fk)
+    {
+        $name = implode('_', array_merge(array_keys($fk), $fk));
 
-	/**
-	 * @return void
-	 */
-	protected function fkDown()
-	{
-		foreach ($this->fk as $fk) {
-			$name = $this->getFkName($fk);
-			$this->dropForeignKey($name, array_keys($fk)[0]);
-		}
-	}
+        return $name;
+    }
 
-	/**
-	 * Удаляет поля
-	 *
-	 * @return void
-	 */
-	protected function fieldsDown()
-	{
-		foreach ($this->fields as $table => $fields) {
-			foreach (array_keys($fields) as $fieldName) {
-				$this->dropColumn($table, $fieldName);
-			}
-		}
-	}
+    /**
+     * Откатывает миграцию
+     *
+     * @return bool
+     */
+    public function safeDown()
+    {
+        try {
+            $this->fkDown();
+            $this->valDown();
+            $this->fieldsDown();
+            $this->tableDown();
+        } catch (\Exception $e) {
+            return false;
+        }
 
-	/**
-	 * @return void
-	 */
-	protected function tableDown()
-	{
-		foreach (array_keys($this->tables) as $tableName) {
-			$this->dropTable($tableName);
-		}
-	}
+        return true;
+    }
+
+    /**
+     * @return void
+     */
+    protected function fkDown()
+    {
+        foreach ($this->fk as $fk) {
+            $name = $this->getFkName($fk);
+            $this->dropForeignKey($name, array_keys($fk)[0]);
+        }
+    }
+
+    /**
+     * Удаляет поля
+     *
+     * @return void
+     */
+    protected function fieldsDown()
+    {
+        foreach ($this->fields as $table => $fields) {
+            foreach (array_keys($fields) as $fieldName) {
+                $this->dropColumn($table, $fieldName);
+            }
+        }
+    }
+
+    /**
+     * @return void
+     */
+    protected function tableDown()
+    {
+        foreach (array_keys($this->tables) as $tableName) {
+            $this->dropTable($tableName);
+        }
+    }
+
+    /**
+     * Удаляет данные
+     *
+     * @return bool
+     */
+    protected function valDown()
+    {
+        $data = $this->setValues();
+        if (count($data)) {
+            foreach ($data as $tabName => $valArray) {
+                foreach ($valArray as $item) {
+                    $this->delete($tabName, $item);
+                }
+            }
+        }
+
+        return true;
+    }
+
 }
