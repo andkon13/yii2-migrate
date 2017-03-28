@@ -21,6 +21,8 @@ class Migration extends \webtoucher\migrate\components\Migration
     private $fk = [];
     /** @var array */
     private $fields = [];
+    /** @var array */
+    private $indexes = [];
 
     /**
      * @return void
@@ -28,9 +30,10 @@ class Migration extends \webtoucher\migrate\components\Migration
     public function init()
     {
         parent::init();
-        $this->tables = $this->setTables();
-        $this->fields = $this->setFields();
-        $this->fk     = $this->setForeignKeys();
+        $this->tables  = $this->setTables();
+        $this->fields  = $this->setFields();
+        $this->fk      = $this->setForeignKeys();
+        $this->indexes = $this->setIndexes();
     }
 
     /**
@@ -115,6 +118,22 @@ class Migration extends \webtoucher\migrate\components\Migration
     }
 
     /**
+     * Добавляет/убирает индексы
+     * <code>
+     * return [
+     *             'index_name_0'   => ['tableName', 'field'],
+     *             'index_name_1' => ['tableName', ['field0', 'field1', ...], $isUnique],
+     *         ];
+     * </code>
+     *
+     * @return array
+     */
+    public function setIndexes()
+    {
+        return [];
+    }
+
+    /**
      * Применяет миграцию
      *
      * @return bool
@@ -126,6 +145,7 @@ class Migration extends \webtoucher\migrate\components\Migration
             $this->fieldsUp();
             $this->valUp();
             $this->fkUp();
+            $this->indexesUp();
         } catch (\Exception $e) {
             return false;
         }
@@ -221,6 +241,23 @@ class Migration extends \webtoucher\migrate\components\Migration
     }
 
     /**
+     * Добавляет индексы
+     *
+     * @return bool
+     */
+    protected function indexesUp()
+    {
+        foreach ($this->indexes as $indexName => $params) {
+            $table    = $params[0];
+            $columns  = $params[1];
+            $isUnique = (array_key_exists(2, $params) ? $params[2] : false);
+            $this->createIndex($indexName, $table, $columns, $isUnique);
+        }
+
+        return true;
+    }
+
+    /**
      * Откатывает миграцию
      *
      * @return bool
@@ -228,6 +265,7 @@ class Migration extends \webtoucher\migrate\components\Migration
     public function safeDown()
     {
         try {
+            $this->indexexDown();
             $this->fkDown();
             $this->valDown();
             $this->fieldsDown();
@@ -293,4 +331,18 @@ class Migration extends \webtoucher\migrate\components\Migration
         return true;
     }
 
+    /**
+     * Убирает индексы
+     *
+     * @return bool
+     */
+    public function indexexDown()
+    {
+        foreach ($this->indexes as $indexName => $params) {
+            $table = $params[0];
+            $this->dropIndex($indexName, $table);
+        }
+
+        return true;
+    }
 }
