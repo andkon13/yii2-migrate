@@ -144,7 +144,7 @@ class Migration extends \webtoucher\migrate\components\Migration
             $this->tableUp();
             $this->fieldsUp();
             $this->valUp();
-            $this->fkUp();
+            $this->fkUp($this->fk);
             $this->indexesUp();
         } catch (\Exception $e) {
             return false;
@@ -182,11 +182,14 @@ class Migration extends \webtoucher\migrate\components\Migration
     /**
      * создает внешние ключи
      *
+     * @param array $fKeys
+     *
      * @return void
      */
-    protected function fkUp()
+    protected function fkUp($fKeys = null)
     {
-        foreach ($this->fk as $fk) {
+        $fKeys = ($fKeys) ? $fKeys : $this->fk;
+        foreach ($fKeys as $fk) {
             $name   = $this->getFkName($fk);
             $tables = array_keys($fk);
             $keys   = $tables;
@@ -266,7 +269,7 @@ class Migration extends \webtoucher\migrate\components\Migration
     {
         try {
             $this->indexexDown();
-            $this->fkDown();
+            $this->fkDown($this->fk);
             $this->valDown();
             $this->fieldsDown();
             $this->tableDown();
@@ -278,11 +281,14 @@ class Migration extends \webtoucher\migrate\components\Migration
     }
 
     /**
+     * @param null $fKeys
+     *
      * @return void
      */
-    protected function fkDown()
+    protected function fkDown($fKeys = null)
     {
-        foreach ($this->fk as $fk) {
+        $fKeys = ($fKeys) ? $fKeys : $this->fk;
+        foreach ($fKeys as $fk) {
             $name = $this->getFkName($fk);
             $this->dropForeignKey($name, array_keys($fk)[0]);
         }
