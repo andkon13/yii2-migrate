@@ -17,109 +17,7 @@ class Migration extends \yii\db\Migration
     protected $tableOptions = 'ENGINE=InnoDB DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci';
 
     /**
-     * Assigns tables to create them when UP / delete with DOWN
-     * Назначает таблицы для их создания при UP/удалени при DOWN
-     * <code>
-     * [
-     *      'table1' =>
-     *      [
-     *          'id' => $this->primaryKey(),
-     *          'name' => $this->string(255)->notNull(),
-     *          ...
-     *      ]
-     *];
-     * </code>
-     *
-     * @return array
-     */
-    public function setTables()
-    {
-        return [];
-    }
-
-    /**
-     * Adding fields to the tablets
-     * Добавляем поля к табличам
-     * <code>
-     * [
-     *      table => [
-     *          [fieldName => type],
-     *          [fieldName => type],
-     *      ]
-     * ]
-     * </code>
-     *
-     * @return array
-     */
-    protected function setFields()
-    {
-        return [];
-    }
-
-    /**
-     * Sets the foreign keys that will be added / removed when up / down
-     * Устанавливает внешние ключи которые будут добавлены/удалены при up/down
-     * <code>
-     * [
-     *      [
-     *          'tableFrom' => 't2_id',
-     *          'tableTo' => 'id'
-     *      ],
-     *      [
-     *          'tableFrom2'=> 'parent_id',
-     *          'self' => 'id', // self - ссылка на эту-же таблицу
-     *          'delete' => 'CASCADE',// default
-     *          'update' => 'NO ACTION'// default
-     *      ],
-     * ]
-     * </code>
-     *
-     * @return array
-     */
-    public function setForeignKeys()
-    {
-        return [];
-    }
-
-    /**
-     * Insert / removes entries in the database
-     * Добавляет/убирает записи в бд
-     * <code>
-     *  return [
-     *      'tableName' => [
-     *          ['id' => 1, 'name' => 'example1', 'type' => 1],
-     *          ['id' => 2, 'name' => 'example2', 'type' => 2],
-     *          ...
-     *      ]
-     * ];
-     * </code>
-     *
-     * @return array
-     */
-    public function setValues()
-    {
-        return [];
-    }
-
-    /**
-     * Create / drop indexes
-     * Добавляет/убирает индексы
-     * <code>
-     * return [
-     *             'index_name_0'   => ['tableName', 'field'],
-     *             'index_name_1' => ['tableName', ['field0', 'field1', ...], $isUnique],
-     *         ];
-     * </code>
-     *
-     * @return array
-     */
-    public function setIndexes()
-    {
-        return [];
-    }
-
-    /**
-     * Overrid safeUp
+     * Override safeUp
      * Применяет миграцию
      *
      * @return bool
@@ -153,6 +51,27 @@ class Migration extends \yii\db\Migration
     }
 
     /**
+     * Assigns tables to create them when UP / delete with DOWN
+     * Назначает таблицы для их создания при UP/удалени при DOWN
+     * <code>
+     * [
+     *      'table1' =>
+     *      [
+     *          'id' => $this->primaryKey(),
+     *          'name' => $this->string(255)->notNull(),
+     *          ...
+     *      ]
+     *];
+     * </code>
+     *
+     * @return array
+     */
+    public function setTables()
+    {
+        return [];
+    }
+
+    /**
      * added fields
      * Добавляет поля
      *
@@ -165,6 +84,63 @@ class Migration extends \yii\db\Migration
                 $this->addColumn($table, $fieldsName, $type);
             }
         }
+    }
+
+    /**
+     * Create / drop indexes
+     * Добавляет/убирает индексы
+     * <code>
+     * return [
+     *             'index_name_0'   => ['tableName', 'field'],
+     *             'index_name_1' => ['tableName', ['field0', 'field1', ...], $isUnique],
+     *         ];
+     * </code>
+     *
+     * @return array
+     */
+    public function setIndexes()
+    {
+        return [];
+    }
+
+    /**
+     * insert records
+     * инсертит данные
+     *
+     * @return bool
+     */
+    protected function valUp()
+    {
+        $data = $this->setValues();
+        if (count($data)) {
+            foreach ($data as $tabName => $valArray) {
+                foreach ($valArray as $item) {
+                    $this->insert($tabName, $item);
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Insert / removes entries in the database
+     * Добавляет/убирает записи в бд
+     * <code>
+     *  return [
+     *      'tableName' => [
+     *          ['id' => 1, 'name' => 'example1', 'type' => 1],
+     *          ['id' => 2, 'name' => 'example2', 'type' => 2],
+     *          ...
+     *      ]
+     * ];
+     * </code>
+     *
+     * @return array
+     */
+    public function setValues()
+    {
+        return [];
     }
 
     /**
@@ -197,23 +173,28 @@ class Migration extends \yii\db\Migration
     }
 
     /**
-     * insert records
-     * инсертит данные
+     * Sets the foreign keys that will be added / removed when up / down
+     * Устанавливает внешние ключи которые будут добавлены/удалены при up/down
+     * <code>
+     * [
+     *      [
+     *          'tableFrom' => 't2_id',
+     *          'tableTo' => 'id'
+     *      ],
+     *      [
+     *          'tableFrom2'=> 'parent_id',
+     *          'self' => 'id', // self - ссылка на эту-же таблицу
+     *          'delete' => 'CASCADE',// default
+     *          'update' => 'NO ACTION'// default
+     *      ],
+     * ]
+     * </code>
      *
-     * @return bool
+     * @return array
      */
-    protected function valUp()
+    public function setForeignKeys()
     {
-        $data = $this->setValues();
-        if (count($data)) {
-            foreach ($data as $tabName => $valArray) {
-                foreach ($valArray as $item) {
-                    $this->insert($tabName, $item);
-                }
-            }
-        }
-
-        return true;
+        return [];
     }
 
     /**
@@ -272,6 +253,22 @@ class Migration extends \yii\db\Migration
     }
 
     /**
+     * drop indexes
+     * Убирает индексы
+     *
+     * @return bool
+     */
+    public function indexexDown()
+    {
+        foreach ($this->setIndexes() as $indexName => $params) {
+            $table = $params[0];
+            $this->dropIndex($indexName, $table);
+        }
+
+        return true;
+    }
+
+    /**
      * drop FK
      *
      * @return void
@@ -281,34 +278,6 @@ class Migration extends \yii\db\Migration
         foreach ($this->setForeignKeys() as $fk) {
             $name = $this->getFkName($fk);
             $this->dropForeignKey($name, array_keys($fk)[0]);
-        }
-    }
-
-    /**
-     * drop fields
-     * Удаляет поля
-     *
-     * @return void
-     */
-    protected function fieldsDown()
-    {
-        foreach ($this->setFields() as $table => $fields) {
-            foreach (array_keys($fields) as $fieldName) {
-                $this->dropColumn($table, $fieldName);
-            }
-        }
-    }
-
-    /**
-     * drop tables
-     *
-     * @return void
-     */
-    protected function tableDown()
-    {
-        $tables = $this->setTables();
-        foreach (array_keys($tables) as $tableName) {
-            $this->dropTable($tableName);
         }
     }
 
@@ -333,18 +302,49 @@ class Migration extends \yii\db\Migration
     }
 
     /**
-     * drop indexes
-     * Убирает индексы
+     * drop fields
+     * Удаляет поля
      *
-     * @return bool
+     * @return void
      */
-    public function indexexDown()
+    protected function fieldsDown()
     {
-        foreach ($this->setIndexes() as $indexName => $params) {
-            $table = $params[0];
-            $this->dropIndex($indexName, $table);
+        foreach ($this->setFields() as $table => $fields) {
+            foreach (array_keys($fields) as $fieldName) {
+                $this->dropColumn($table, $fieldName);
+            }
         }
+    }
 
-        return true;
+    /**
+     * Adding fields to the tablets
+     * Добавляем поля к табличам
+     * <code>
+     * [
+     *      table => [
+     *          [fieldName => type],
+     *          [fieldName => type],
+     *      ]
+     * ]
+     * </code>
+     *
+     * @return array
+     */
+    protected function setFields()
+    {
+        return [];
+    }
+
+    /**
+     * drop tables
+     *
+     * @return void
+     */
+    protected function tableDown()
+    {
+        $tables = $this->setTables();
+        foreach (array_keys($tables) as $tableName) {
+            $this->dropTable($tableName);
+        }
     }
 }
