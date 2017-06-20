@@ -1,4 +1,7 @@
-миграции используют webtoucher/yii2-migrate для разделения миграций на модули
+Add-on over standard migrations, which automatically creates migration rollback functions.
+---
+Надстройка над стандартными миграциями, позволяющая автоматически создавать функции отката миграции.
+
 uses:
 ```
 class m000000_000000_users extends \andkon\migrate\Migration
@@ -33,3 +36,6 @@ class m000000_000000_users extends \andkon\migrate\Migration
                 'position' => 'id',
                 'delete'   => 'RESTRICT',
             ],
+        ];
+    }
+}

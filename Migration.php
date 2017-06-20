@@ -11,32 +11,13 @@ namespace andkon\migrate;
 /**
  * Class Migrate
  */
-class Migration extends \webtoucher\migrate\components\Migration
+class Migration extends \yii\db\Migration
 {
     /** @var string */
     protected $tableOptions = 'ENGINE=InnoDB DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci';
-    /** @var array */
-    private $tables = [];
-    /** @var array */
-    private $fk = [];
-    /** @var array */
-    private $fields = [];
-    /** @var array */
-    private $indexes = [];
 
     /**
-     * @return void
-     */
-    public function init()
-    {
-        parent::init();
-        $this->tables  = $this->setTables();
-        $this->fields  = $this->setFields();
-        $this->fk      = $this->setForeignKeys();
-        $this->indexes = $this->setIndexes();
-    }
-
-    /**
+     * Assigns tables to create them when UP / delete with DOWN
      * Назначает таблицы для их создания при UP/удалени при DOWN
      * <code>
      * [
@@ -57,6 +38,7 @@ class Migration extends \webtoucher\migrate\components\Migration
     }
 
     /**
+     * Adding fields to the tablets
      * Добавляем поля к табличам
      * <code>
      * [
@@ -75,6 +57,7 @@ class Migration extends \webtoucher\migrate\components\Migration
     }
 
     /**
+     * Sets the foreign keys that will be added / removed when up / down
      * Устанавливает внешние ключи которые будут добавлены/удалены при up/down
      * <code>
      * [
@@ -99,6 +82,7 @@ class Migration extends \webtoucher\migrate\components\Migration
     }
 
     /**
+     * Insert / removes entries in the database
      * Добавляет/убирает записи в бд
      * <code>
      *  return [
@@ -118,6 +102,7 @@ class Migration extends \webtoucher\migrate\components\Migration
     }
 
     /**
+     * Create / drop indexes
      * Добавляет/убирает индексы
      * <code>
      * return [
@@ -134,6 +119,7 @@ class Migration extends \webtoucher\migrate\components\Migration
     }
 
     /**
+     * Overrid safeUp
      * Применяет миграцию
      *
      * @return bool
@@ -154,25 +140,27 @@ class Migration extends \webtoucher\migrate\components\Migration
     }
 
     /**
+     * Create tables
      * Создает таблицы
      *
      * @return void
      */
     protected function tableUp()
     {
-        foreach ($this->tables as $tableName => $fields) {
+        foreach ($this->setTables() as $tableName => $fields) {
             $this->createTable($tableName, $fields, $this->tableOptions);
         }
     }
 
     /**
+     * added fields
      * Добавляет поля
      *
      * @return void
      */
     protected function fieldsUp()
     {
-        foreach ($this->fields as $table => $fields) {
+        foreach ($this->setIndexes() as $table => $fields) {
             foreach ($fields as $fieldsName => $type) {
                 $this->addColumn($table, $fieldsName, $type);
             }
@@ -180,13 +168,14 @@ class Migration extends \webtoucher\migrate\components\Migration
     }
 
     /**
+     * create Forein keys
      * создает внешние ключи
      *
      * @return void
      */
     protected function fkUp()
     {
-        foreach ($this->fk as $fk) {
+        foreach ($this->setForeignKeys() as $fk) {
             $name   = $this->getFkName($fk);
             $tables = array_keys($fk);
             $keys   = $tables;
@@ -208,6 +197,7 @@ class Migration extends \webtoucher\migrate\components\Migration
     }
 
     /**
+     * insert records
      * инсертит данные
      *
      * @return bool
@@ -227,6 +217,7 @@ class Migration extends \webtoucher\migrate\components\Migration
     }
 
     /**
+     * Genecated name for FK
      * Генегирует имя связи
      *
      * @param array $fk описание связи
@@ -235,19 +226,21 @@ class Migration extends \webtoucher\migrate\components\Migration
      */
     protected function getFkName($fk)
     {
-        $name = implode('_', array_merge(array_keys($fk), $fk));
+        $tables = array_slice(array_keys($fk), 0, 2);
+        $name   = implode('_', [$tables[0], $fk[$tables[0]], $tables[1], $fk[$tables[1]]]);
 
         return $name;
     }
 
     /**
+     * Created indexes
      * Добавляет индексы
      *
      * @return bool
      */
     protected function indexesUp()
     {
-        foreach ($this->indexes as $indexName => $params) {
+        foreach ($this->setIndexes() as $indexName => $params) {
             $table    = $params[0];
             $columns  = $params[1];
             $isUnique = (array_key_exists(2, $params) ? $params[2] : false);
@@ -258,6 +251,7 @@ class Migration extends \webtoucher\migrate\components\Migration
     }
 
     /**
+     * override safeDown
      * Откатывает миграцию
      *
      * @return bool
@@ -278,24 +272,27 @@ class Migration extends \webtoucher\migrate\components\Migration
     }
 
     /**
+     * drop FK
+     *
      * @return void
      */
     protected function fkDown()
     {
-        foreach ($this->fk as $fk) {
+        foreach ($this->setForeignKeys() as $fk) {
             $name = $this->getFkName($fk);
             $this->dropForeignKey($name, array_keys($fk)[0]);
         }
     }
 
     /**
+     * drop fields
      * Удаляет поля
      *
      * @return void
      */
     protected function fieldsDown()
     {
-        foreach ($this->fields as $table => $fields) {
+        foreach ($this->setFields() as $table => $fields) {
             foreach (array_keys($fields) as $fieldName) {
                 $this->dropColumn($table, $fieldName);
             }
@@ -303,16 +300,20 @@ class Migration extends \webtoucher\migrate\components\Migration
     }
 
     /**
+     * drop tables
+     *
      * @return void
      */
     protected function tableDown()
     {
-        foreach (array_keys($this->tables) as $tableName) {
+        $tables = $this->setTables();
+        foreach (array_keys($tables) as $tableName) {
             $this->dropTable($tableName);
         }
     }
 
     /**
+     * delete records
      * Удаляет данные
      *
      * @return bool
@@ -332,13 +333,14 @@ class Migration extends \webtoucher\migrate\components\Migration
     }
 
     /**
+     * drop indexes
      * Убирает индексы
      *
      * @return bool
      */
     public function indexexDown()
     {
-        foreach ($this->indexes as $indexName => $params) {
+        foreach ($this->setIndexes() as $indexName => $params) {
             $table = $params[0];
             $this->dropIndex($indexName, $table);
         }

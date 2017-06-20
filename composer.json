@@ -1,6 +1,6 @@
 {
   "name": "andkon/yii2-migrate",
-  "description": "Класс для упрощения написания миграций",
+  "description": "Class to simplify the writing of migrations",
   "minimum-stability": "dev",
   "license": "proprietary",
   "authors": [
@@ -10,8 +10,7 @@
     }
   ],
   "require": {
-    "php": ">=5.4.0",
-    "webtoucher/yii2-migrate": ">=v1.0.1"
+    "php": ">=5.4.0"
   },
   "autoload": {
     "psr-4": {
