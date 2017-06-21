@@ -79,7 +79,7 @@ class Migration extends \yii\db\Migration
      */
     protected function fieldsUp()
     {
-        foreach ($this->setIndexes() as $table => $fields) {
+        foreach ($this->setFields() as $table => $fields) {
             foreach ($fields as $fieldsName => $type) {
                 $this->addColumn($table, $fieldsName, $type);
             }
