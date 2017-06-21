@@ -198,7 +198,7 @@ class Migration extends \yii\db\Migration
     }
 
     /**
-     * Genecated name for FK
+     * Generated name for FK
      * Генегирует имя связи
      *
      * @param array $fk описание связи
@@ -207,8 +207,7 @@ class Migration extends \yii\db\Migration
      */
     protected function getFkName($fk)
     {
-        $tables = array_slice(array_keys($fk), 0, 2);
-        $name   = implode('_', [$tables[0], $fk[$tables[0]], $tables[1], $fk[$tables[1]]]);
+        $name = implode('_', array_merge(array_keys($fk), $fk));
 
         return $name;
     }
